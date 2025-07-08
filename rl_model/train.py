@@ -1,9 +1,15 @@
-import gymnasium as gym
+import logging
+import time
+
 import ale_py
+import gymnasium as gym
+import numpy as np
 
 from rl_model.agent import Agent
+from rl_model.utils import save_screenshot, save_array
 
 gym.register_envs(ale_py)
+
 
 def train_model():
     env = gym.make("MsPacmanNoFrameskip-v4", render_mode="rgb_array")
@@ -50,15 +56,16 @@ def train_model():
         while not done:
             action = agent.choose_action(observation)
             action_count += 1
-            print_debug(f"Action >> original: {action}")
-            print_debug(f"Action >> mapped: {actions_map[int(action)]}")
+            logging.info(f"Action >> original: {action}")
+            logging.info(f"Action >> mapped: {actions_map[int(action)]}")
             # Se calcula el siguiente estado, su recompensa, si ya se legó a un estado terminal, etc
             observation_, reward, done, truncated, info = env.step(action)
 
             score += reward
             if screen >= 250:
                 prev_screen = env.render()
-                print(f"Game information: Game: {i}, Action: {actions_map[int(action)]}, Score: {score}, Reward: {reward}, Done: {done}, Truncated: {truncated}")
+                print(
+                    f"Game information: Game: {i}, Action: {actions_map[int(action)]}, Score: {score}, Reward: {reward}, Done: {done}, Truncated: {truncated}")
                 save_screenshot("100_game/screenshots", f"game_{i}_score_{int(score)}", prev_screen)
                 print("Saving Screen...")
                 screen = 0
@@ -71,9 +78,10 @@ def train_model():
         scores.append(score)
         avg_score = np.mean(scores[max(0, i - n_games):(i + 1)])
         end_time = time.time()
-        elapsed_time = (end_time - start_time)/60
+        elapsed_time = (end_time - start_time) / 60
         time_per_game.append(elapsed_time)
-        print(f"Game Finished! duration: {elapsed_time} minutes, episode: {i}, score: {score}, average_score: {avg_score}")
+        print(
+            f"Game Finished! duration: {elapsed_time} minutes, episode: {i}, score: {score}, average_score: {avg_score}")
 
         if i % 10 == 0 and i > 0:
             print("Saving Model...")
