@@ -1,4 +1,4 @@
-from model.agent import Agent
+from rl_model.agent import Agent
 
 
 def run_agent():
